@@ -98,3 +98,21 @@ def count_failing_students(filename):
             if 0 <= score < 60:
                 count_failing += 1
     return count_failing
+
+
+def main():
+    while True:
+        filename = input("Enter the name of the file: ")
+        try:
+            process_students(filename)
+            average_grade = calculate_average_grade(filename)
+            print ("Average: ", average_grade)
+            failing_count = count_failing_students(filename)
+            print("Failing students: ", failing_count)
+            break
+        except FileNotFoundError:
+            print("Error: Please check file name.")
+            continue
+
+if __name__ == "__main__":
+    main()

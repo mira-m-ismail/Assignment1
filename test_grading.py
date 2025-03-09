@@ -24,7 +24,7 @@ def test_calculate_grade2():
     #analyze
     assert expectedResult == actualResult
 
-def test_calculate_grade2():
+def test_calculate_grade3():
     #setup
     score = 75
     expectedResult = "C"

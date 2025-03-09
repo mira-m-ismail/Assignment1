@@ -1,46 +1,45 @@
-import os
+import csv
+import re
 
 def calculate_grade(score):
-
     try:
-        score = float(score)
+        score = float(score)  # Typecasts the score value from string into number
     except ValueError:
-        return 'Error: Non-numeric score'
-
-    if score<0 or score>100:
-        return 'Error: Invalid score'
-    if score>= 90:
-        return 'A'
-    elif score>=80:
-        return 'B' 
-    elif score>=70:
-        return 'C'
-    elif score >= 60:
-        return 'D'
+        return "Error: Non-numeric score" # Returns error if score is not an integer/float
+    
+    if score < 0 or score > 100:
+        return "Error: Invalid score" # Returns error if score is outside valid range
+    if 90 <= score <= 100:
+        return "A"
+    elif 80 <= score < 90:
+        return "B"
+    elif 70 <= score < 80:
+        return "C"
+    elif 60 <= score < 70:
+        return "D"
     else:
-        return 'F'
+        return "F"
 
 
 def process_students(filename):
-
-    if not os.path.exists(filename):
-        print('Error:File not found')
-        return
     try:
         with open(filename, 'r') as file:
-            for line in file:
-                line = line.strip()
-                if not line:
+            csvfile = csv.reader(file)
+            for row in csvfile:
+                if len(row) != 2:
+                    print("Error: Missing data for "+ row)
                     continue
-                parts = line.split(',')
-                if len(parts) != 2:
-                    print('Error:Incorrect data format in line:', line)
-                    continue
-                name, score_str = parts
-                grade = calculate_grade(score_str)
-                print(name.strip() + ': ' + grade)
+                name, score = row
+                grade = calculate_grade(score)
+                if 'Error' in grade:            # if error message is returned, print "error: <error type> for <name of student>"
+                    print(grade+' for '+name)
+                else:                           # else, print name and grade normally
+                    print(name+': '+grade)
+    except FileNotFoundError:
+        print("Error: File not found")          # throws error if file unavailable
     except Exception as e:
-        print('An error occurred while processing the file:', e)
+        print("Error:" + str(e))                # error occured when processing the file
+
 
 def calculate_average_grade(filename):
     """
@@ -48,71 +47,68 @@ def calculate_average_grade(filename):
     Returns the letter grade for the average score.
     If no valid scores, returns an error message.
     """
-    if not os.path.exists(filename):
-        return 'Error: File not found'
-    total = 0.0
+    total_score = 0
     count = 0
-    with open(filename, 'r') as file:
-        for line in file:
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split(',')
-            if len(parts) != 2:
-                continue
-            _, score_str = parts
-            try:
-                score = float(score_str)
-            except ValueError:
-                continue  
-            if 0 <= score <= 100:
-                total += score
-                count += 1
-    if count == 0:
-        return 'Error: No valid scores found'
-    average = total / count
-    return calculate_grade(average)
+    try:
+        with open(filename, 'r') as file:
+            csvfile = csv.reader(file)
+            for row in csvfile:
+                if len(row) != 2:
+                    continue
+                name, score = row
+                grade = calculate_grade(score)
+                if "Error" not in grade:        # if it is error-free, carry on
+                    total_score += int(score)   # add scores with each other
+                    count += 1                  # increment count or no. of scores or students
+        if count == 0:
+            print("Error: No valid student data")
+            return
+        average = total_score / count           # calculates avg. and passes into grade calculator
+        class_avg = calculate_grade(average)
+        print("Class Average: "+class_avg)
+    except FileNotFoundError:
+        print("Error: File not found")
+    except Exception as e:
+        print("Error: "+str(e))
+
 
 def count_failing_students(filename):
     """
-    Counts the number of failing students (score below 60) in the given CSV file.
-    Returns the count. If file not found, prints error and returns None.
+    Counts the number of failing students (score below 60) in the CSV file,
+    & returns the count. If file not found, prints error
     """
-    if not os.path.exists(filename):
-        print('Error: File not found')
-        return None
-    count_failing = 0
-    with open(filename, 'r') as file:
-        for line in file:
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split(',')
-            if len(parts) != 2:
-                continue
-            _, score_str = parts
-            try:
-                score = float(score_str)
-            except ValueError:
-                continue
-            if 0 <= score < 60:
-                count_failing += 1
-    return count_failing
 
+    failing_count = 0
+    failing_regex = "^([0-9]|[1-5][0-9])$"  # regular expression to match failing grades (0-59)
+
+    try:
+        with open(filename, 'r') as file:
+            csvfile = csv.reader(file)
+            for row in csvfile:
+                if len(row) != 2:
+                    continue
+                name, score = row
+                if re.match(failing_regex, str(score)): # check if the score matches the failing pattern
+                    failing_count += 1
+        print("Number of Failing Students: "+str(failing_count))
+    except FileNotFoundError:
+        print("Error: File not found")
+    except Exception as e:
+        print("Error: "+ str(e))
 
 def main():
     while True:
-        filename = input("Enter the name of the file: ")
+        filename = input("Enter the filename (e.g., students.csv): ")
         try:
             process_students(filename)
-            average_grade = calculate_average_grade(filename)
-            print ("Average: ", average_grade)
-            failing_count = count_failing_students(filename)
-            print("Failing students: ", failing_count)
+            calculate_average_grade(filename)
+            count_failing_students(filename)
             break
-        except FileNotFoundError:
-            print("Error: Please check file name.")
-            continue
+        except Exception as e:
+            print("Error: "+str(e))
+            retry = input("Do you want to retry with a different filename? (yes/no): ")
+            if retry.lower() != 'yes':      # allows user to retry with a different file name in case of fail
+              break
 
 if __name__ == "__main__":
     main()

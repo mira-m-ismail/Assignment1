@@ -1,4 +1,4 @@
-import grading_test
+import grading_system
 
 from grading_system import *
 

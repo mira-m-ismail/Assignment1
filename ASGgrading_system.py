@@ -30,9 +30,7 @@ def process_students(filename):
         with open(filename, 'r') as file:
             csvfile = csv.reader(file)
             for row in csvfile:
-                if len(row) != 2:
-                    print("Error: Missing data for ", row[0])
-                    continue
+                
                 name = row[0]
                 score = row[1]
                 grade = calculate_grade(score)
@@ -58,8 +56,7 @@ def calculate_average_grade(filename):
         with open(filename, 'r') as file:
             csvfile = csv.reader(file)
             for row in csvfile:
-                if len(row) != 2:
-                    continue
+                
                 name = row[0]
                 score = row[1]       # values for name & score are set to the data in each row
                 grade = calculate_grade(score)
@@ -93,8 +90,7 @@ def count_failing_students(filename):
         with open(filename, 'r') as file:
             csvfile = csv.reader(file)
             for row in csvfile:
-                if len(row) != 2:
-                    continue
+                
                 name = row[0]
                 score = row[1]
                 if re.match(failing_regex, str(score)): # check if the score matches the failing pattern

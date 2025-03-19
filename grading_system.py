@@ -27,17 +27,18 @@ def process_students(filename):
             csvfile = csv.reader(file)
             for row in csvfile:
                 if len(row) != 2:
-                    print("Error: Missing data for "+ row)
+                    print("Error: Missing data for ", row[0])
                     continue
-                name, score = row
+                name = row[0]
+                score = row[1]
                 grade = calculate_grade(score)
-                if 'Error' in grade:            # if error message is returned, print "error: <error type> for <name of student>"
-                    print(grade+' for '+name)
+                if 'grade' != score :            # if error message is returned, print "error: <error type> for <name of student>"
+                    print(grade,' for ',name)
                 else:                           # else, print name and grade normally
-                    print(name+': '+grade)
+                    print(name,': ',grade)
     except FileNotFoundError:
         print("Error: File not found")          # throws error if file unavailable
-    except Exception as e:
+    except valueerror:
         print("Error:" + str(e))                # error occured when processing the file
 
 

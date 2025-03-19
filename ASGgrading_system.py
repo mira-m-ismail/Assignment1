@@ -31,15 +31,15 @@ def process_students(filename):
             csvfile = csv.reader(file)
             for row in csvfile:
                 if len(row) != 2:
-                    print("Error: Missing data for "+ row)
+                    print("Error: Missing data for ", row[0])
                     continue
                 name = row[0]
                 score = row[1]
                 grade = calculate_grade(score)
-                if 'Error' in grade:            # if error message is returned, print "error: <error type> for <name of student>"
-                    print(grade+' for '+name)
+                if grade != calculate_grade(score):            # if error message is returned, print "error: <error type> for <name of student>"
+                    print(grade,' for ',name)
                 else:                           # else, print name and grade normally
-                    print(name+': '+grade)
+                    print(name,': ',grade)
     except FileNotFoundError:
         print("Error: File not found")          # throws error if file unavailable
     except ValueError:
@@ -63,7 +63,7 @@ def calculate_average_grade(filename):
                 name = row[0]
                 score = row[1]       # values for name & score are set to the data in each row
                 grade = calculate_grade(score)
-                if "Error" not in grade:        # if it is error-free, carry on
+                if grade==calculate_grade(score):        # if it is error-free, carry on
                     total_score += int(score)   # add scores with each other
                     count += 1                  # increment count or no. of scores or students
         if count == 0:
@@ -71,7 +71,7 @@ def calculate_average_grade(filename):
             return
         average = total_score / count           # calculates avg. and passes into grade calculator
         class_avg = calculate_grade(average)
-        print("Class Average: "+class_avg)
+        print("Class Average: ", class_avg)
     except FileNotFoundError:
         print("Error: File not found")
     except ValueError:

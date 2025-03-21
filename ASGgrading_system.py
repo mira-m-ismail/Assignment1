@@ -30,14 +30,15 @@ def process_students(filename):
         with open(filename, 'r') as file:
             csvfile = csv.reader(file)
             for row in csvfile:
-                
                 name = row[0]
                 score = row[1]
                 grade = calculate_grade(score)
-                if grade != calculate_grade(score):            # if error message is returned, print "error: <error type> for <name of student>"
-                    print(grade,' for ',name)
+                if 'Error' in grade:            # if error message is returned, print "error: <error type> for <name of student>"
+                    print(grade+' for '+name)
+                    return False
                 else:                           # else, print name and grade normally
-                    print(name,': ',grade)
+                    print(name+': '+grade)
+                    return (name+': '+grade)
     except FileNotFoundError:
         print("Error: File not found")          # throws error if file unavailable
     except ValueError:
@@ -56,11 +57,10 @@ def calculate_average_grade(filename):
         with open(filename, 'r') as file:
             csvfile = csv.reader(file)
             for row in csvfile:
-                
                 name = row[0]
                 score = row[1]       # values for name & score are set to the data in each row
                 grade = calculate_grade(score)
-                if grade==calculate_grade(score):        # if it is error-free, carry on
+                if "Error" not in grade:        # if it is error-free, carry on
                     total_score += int(score)   # add scores with each other
                     count += 1                  # increment count or no. of scores or students
         if count == 0:
@@ -68,7 +68,8 @@ def calculate_average_grade(filename):
             return
         average = total_score / count           # calculates avg. and passes into grade calculator
         class_avg = calculate_grade(average)
-        print("Class Average: ", class_avg)
+        print("Class Average: "+class_avg)
+        return "Class Average: "+class_avg
     except FileNotFoundError:
         print("Error: File not found")
     except ValueError:
@@ -83,19 +84,18 @@ def count_failing_students(filename):
 
     failing_count = 0
     failing_regex = "^([0-9]|[1-5][0-9])$"  # to match failing grades (0-59)
-    # failing_regex = "[1-5]\d"  # to match failing grades (0-59)
 
 
     try:
         with open(filename, 'r') as file:
             csvfile = csv.reader(file)
             for row in csvfile:
-                
                 name = row[0]
                 score = row[1]
                 if re.match(failing_regex, str(score)): # check if the score matches the failing pattern
                     failing_count += 1
         print("Number of Failing Students: "+str(failing_count))
+        return "Number of Failing Students: "+str(failing_count)
     except FileNotFoundError:
         print("Error: File not found")
     except ValueError:
